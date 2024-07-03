@@ -7,7 +7,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Beneficiary } from './schemas/beneficiary.schema';
 import { Model } from 'mongoose';
 import { CreateBeneficiaryDto } from './dto';
-import { BeneficiaryDto } from './dto/beneficiary.dto';
+import { UpdateBeneficiaryDto } from './dto/update-beneficiary.dto';
 
 @Injectable()
 export class BeneficiaryService {
@@ -60,15 +60,23 @@ export class BeneficiaryService {
 
   async updateBeneficiary(
     id: string,
-    dto: BeneficiaryDto,
+    dto: UpdateBeneficiaryDto,
   ): Promise<{ message: string; data: Beneficiary }> {
     try {
+      console.log({ id, dto, dtoLength: Object.keys(dto).length });
+      if (Object.keys(dto).length <= 0) {
+        throw new BadRequestException(`At least one request body expected`);
+      }
       let beneficiary: any = await this.beneficiaryModel.findById(id);
       console.log(beneficiary);
-      if (beneficiary) {
+      if (!beneficiary) {
         throw new NotFoundException('Beneficiary not found');
       }
-      beneficiary = await this.beneficiaryModel.findByIdAndUpdate(dto);
+      beneficiary = await this.beneficiaryModel.findOneAndUpdate(
+        { _id: id },
+        { ...dto },
+        { new: true },
+      );
       return { message: 'Beneficiary updated successfully', data: beneficiary };
     } catch (error) {
       throw error;
@@ -81,10 +89,10 @@ export class BeneficiaryService {
     try {
       let beneficiary: any = await this.beneficiaryModel.findById(id);
       console.log(beneficiary);
-      if (beneficiary) {
+      if (!beneficiary) {
         throw new NotFoundException('Beneficiary not found');
       }
-      beneficiary = await this.beneficiaryModel.findByIdAndDelete();
+      beneficiary = await this.beneficiaryModel.findByIdAndDelete(id);
       return { message: 'Beneficiary updated successfully', data: beneficiary };
     } catch (error) {
       throw error;

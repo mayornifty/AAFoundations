@@ -8,8 +8,7 @@ import {
   Put,
 } from '@nestjs/common';
 import { BeneficiaryService } from './beneficiary.service';
-import { CreateBeneficiaryDto } from './dto';
-import { BeneficiaryDto } from './dto/beneficiary.dto';
+import { CreateBeneficiaryDto, UpdateBeneficiaryDto } from './dto';
 
 @Controller('api/beneficiaries')
 export class BeneficiaryController {
@@ -31,10 +30,15 @@ export class BeneficiaryController {
   }
 
   @Put(':id')
-  updateBeneficiary(@Param('id') id: string, @Body() dto: BeneficiaryDto) {
+  updateBeneficiary(
+    @Param('id') id: string,
+    @Body() dto: UpdateBeneficiaryDto,
+  ) {
     return this.beneficiaryService.updateBeneficiary(id, dto);
   }
 
   @Delete(':id')
-  deleteBeneficiary() {}
+  deleteBeneficiary(@Param('id') id: string) {
+    return this.beneficiaryService.deleteBeneficiary(id);
+  }
 }
