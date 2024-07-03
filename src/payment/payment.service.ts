@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Payment } from './schemas/payment.schema.dto';
 import { Model } from 'mongoose';
@@ -58,6 +62,9 @@ export class PaymentService {
     dto: UpdatePaymentDto,
   ): Promise<{ message: string; data: Payment }> {
     try {
+      if (Object.keys(dto).length <= 0) {
+        throw new BadRequestException('At least one request body required');
+      }
       const data = await this.paymentModel.findByIdAndUpdate(id, { ...dto });
       if (!data) throw new NotFoundException('Payment not found');
       return { message: 'Payments fetched successfully', data };
