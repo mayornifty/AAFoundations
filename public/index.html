@@ -2,18 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Overview Page</title>
-    <!-- Include any CSS frameworks or stylesheets here -->
+    <title>Overview</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Overview Page</h1>
-    <div id="summaryCards"></div>
-    <div id="charts"></div>
-
-    <!-- Include any JavaScript libraries or scripts here -->
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <h1>Overview</h1>
+    <div id="overview">
+        <p>Total Beneficiaries: <span id="totalBeneficiaries"></span></p>
+        <p>Total Payments: <span id="totalPayments"></span></p>
+        <p>Total Medical Records: <span id="totalMedicalRecords"></span></p>
+        <p>Total Donations: <span id="totalDonations"></span></p>
+    </div>
     <script src="overview.js"></script>
 </body>
 </html>
