@@ -47,6 +47,26 @@
                 <label for="consultation">Consultation Fee</label>
                 <input type="number" step="0.01" class="form-control" id="consultation" name="consultation" required>
             </div>
+            <!-- Utility Cost -->
+            <div class="form-group">
+                <label for="utility_cost">Utility Cost</label>
+                <input type="number" step="0.01" class="form-control" id="utility_cost" name="utility_cost">
+            </div>
+            <!-- Professional Fee -->
+            <div class="form-group">
+                <label for="prof_fee">Professional Fee</label>
+                <input type="number" step="0.01" class="form-control" id="prof_fee" name="prof_fee">
+            </div>
+            <!-- Bed Cost -->
+            <div class="form-group">
+                <label for="bed">Bed Cost</label>
+                <input type="number" step="0.01" class="form-control" id="bed" name="bed">
+            </div>
+            <!-- Line Total -->
+            <div class="form-group">
+                <label for="line_total">Line Total</label>
+                <input type="number" step="0.01" class="form-control" id="line_total" name="line_total" required>
+            </div>
             <!-- Extra Information -->
             <div class="form-group">
                 <label for="extra">Extra Information</label>
@@ -89,7 +109,21 @@
             // Submit Form Handling
             $('#medicalRecordForm').submit(function(event) {
                 event.preventDefault();
-                var formData = $(this).serialize();
+                var formData = {
+                    date: $('#date').val(),
+                    names: $('#beneficiary option:selected').text(),
+                    hosp_no: $('#hosp_no').val(),
+                    lab_cost: parseFloat($('#lab_cost').val()),
+                    drugs_cost: parseFloat($('#drugs_cost').val()),
+                    consultation: parseFloat($('#consultation').val()),
+                    utility_cost: parseFloat($('#utility_cost').val()),
+                    prof_fee: parseFloat($('#prof_fee').val()),
+                    bed: parseFloat($('#bed').val()),
+                    line_total: parseFloat($('#line_total').val()),
+                    beneficiary_id: $('#beneficiary').val(),
+                    extra: $('#extra').val()
+                };
+
                 $.ajax({
                     type: 'POST',
                     url: 'https://samuel-nest-restapi.onrender.com/api/medical-records',
