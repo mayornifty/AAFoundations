@@ -11,18 +11,21 @@
 </head>
 <body>
     <div class="container mt-5">
-        <h1>Medical Records</h1>
-        <!-- Form for Adding or Updating Medical Record -->
+        <h1>Add New Medical Record</h1>
+        <!-- Medical Records Form -->
         <form id="medicalRecordForm">
             <!-- Date -->
             <div class="form-group">
                 <label for="date">Date</label>
                 <input type="date" class="form-control" id="date" name="date" required>
             </div>
-            <!-- Names -->
+            <!-- Beneficiary Name Dropdown -->
             <div class="form-group">
-                <label for="names">Names</label>
-                <input type="text" class="form-control" id="names" name="names" required>
+                <label for="beneficiary">Beneficiary</label>
+                <select class="form-control" id="beneficiary" name="beneficiary_id" required>
+                    <option value="">Select Beneficiary</option>
+                    <!-- Options will be dynamically populated using JavaScript -->
+                </select>
             </div>
             <!-- Hospital Number -->
             <div class="form-group">
@@ -39,33 +42,11 @@
                 <label for="drugs_cost">Drugs Cost</label>
                 <input type="number" step="0.01" class="form-control" id="drugs_cost" name="drugs_cost" required>
             </div>
-            <!-- Consultation -->
+            <!-- Consultation Fee -->
             <div class="form-group">
-                <label for="consultation">Consultation</label>
+                <label for="consultation">Consultation Fee</label>
                 <input type="number" step="0.01" class="form-control" id="consultation" name="consultation" required>
             </div>
-            <!-- Utility Cost -->
-            <div class="form-group">
-                <label for="utility_cost">Utility Cost</label>
-                <input type="number" step="0.01" class="form-control" id="utility_cost" name="utility_cost">
-            </div>
-            <!-- Professional Fee -->
-            <div class="form-group">
-                <label for="prof_fee">Professional Fee</label>
-                <input type="number" step="0.01" class="form-control" id="prof_fee" name="prof_fee">
-            </div>
-            <!-- Bed -->
-            <div class="form-group">
-                <label for="bed">Bed</label>
-                <input type="number" step="0.01" class="form-control" id="bed" name="bed">
-            </div>
-            <!-- Line Total -->
-            <div class="form-group">
-                <label for="line_total">Line Total</label>
-                <input type="number" step="0.01" class="form-control" id="line_total" name="line_total" required>
-            </div>
-            <!-- Beneficiary ID (Hidden) -->
-            <input type="hidden" id="beneficiary_id" name="beneficiary_id" value="replace_with_beneficiary_id">
             <!-- Extra Information -->
             <div class="form-group">
                 <label for="extra">Extra Information</label>
@@ -78,24 +59,50 @@
 
     <!-- Include Bootstrap JS (optional) -->
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <!-- JavaScript for Handling Form Submissions -->
+    <!-- JavaScript for Handling Form Submissions and Dropdown Population -->
     <script>
-        // Submit Form Handling (Example using jQuery)
-        $('#medicalRecordForm').submit(function(event) {
-            event.preventDefault();
-            var formData = $(this).serialize();
-            $.ajax({
-                type: 'POST',
-                url: 'https://samuel-nest-restapi.onrender.com/api/medical-records',
-                data: formData,
-                success: function(response) {
-                    alert('Medical record added successfully!');
-                    $('#medicalRecordForm')[0].reset();
-                },
-                error: function(error) {
-                    alert('Error adding medical record. Please try again.');
-                    console.error('Error:', error);
-                }
+        $(document).ready(function() {
+            // Function to fetch beneficiaries and populate dropdown
+            function fetchBeneficiaries() {
+                $.ajax({
+                    type: 'GET',
+                    url: 'https://samuel-nest-restapi.onrender.com/api/beneficiaries',
+                    success: function(response) {
+                        var beneficiaries = response.data;
+                        var dropdown = $('#beneficiary');
+                        dropdown.empty();
+                        dropdown.append('<option value="">Select Beneficiary</option>');
+                        $.each(beneficiaries, function(index, beneficiary) {
+                            dropdown.append('<option value="' + beneficiary._id + '">' + beneficiary.name + '</option>');
+                        });
+                    },
+                    error: function(error) {
+                        console.error('Error fetching beneficiaries:', error);
+                        alert('Error fetching beneficiaries. Please try again.');
+                    }
+                });
+            }
+
+            // Call fetchBeneficiaries function on document ready
+            fetchBeneficiaries();
+
+            // Submit Form Handling
+            $('#medicalRecordForm').submit(function(event) {
+                event.preventDefault();
+                var formData = $(this).serialize();
+                $.ajax({
+                    type: 'POST',
+                    url: 'https://samuel-nest-restapi.onrender.com/api/medical-records',
+                    data: formData,
+                    success: function(response) {
+                        alert('Medical record added successfully!');
+                        $('#medicalRecordForm')[0].reset();
+                    },
+                    error: function(error) {
+                        console.error('Error adding medical record:', error);
+                        alert('Error adding medical record. Please try again.');
+                    }
+                });
             });
         });
     </script>
