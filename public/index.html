@@ -2,20 +2,153 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Overview</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .summary-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 10px;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
-    <h1>Overview</h1>
-    <div id="overview">
-        <p>Total Beneficiaries: <span id="totalBeneficiaries"></span></p>
-        <p>Total Payments: <span id="totalPayments"></span></p>
-        <p>Total Medical Records: <span id="totalMedicalRecords"></span></p>
-        <p>Total Donations: <span id="totalDonations"></span></p>
+    <div class="container mt-5">
+        <div id="summaryCards" class="row">
+            <!-- Summary cards will be inserted here -->
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <canvas id="paymentsChart"></canvas>
+            </div>
+            <div class="col-md-6">
+                <canvas id="medicalCostsChart"></canvas>
+            </div>
+        </div>
     </div>
-    <canvas id="paymentsChart" width="400" height="200"></canvas>
-    <canvas id="medicalCostsChart" width="400" height="200"></canvas>
-    <script src="overview.js"></script>
+
+    <script>
+        const apiUrl = 'https://samuel-nest-restapi.onrender.com/api';
+
+        // Function to fetch data from multiple endpoints
+        async function fetchData() {
+            try {
+                const [beneficiariesRes, paymentsRes, medicalRecordsRes, donationsRes] = await Promise.all([
+                    axios.get(`${apiUrl}/beneficiaries`),
+                    axios.get(`${apiUrl}/payments`),
+                    axios.get(`${apiUrl}/medical-records`),
+                    axios.get(`${apiUrl}/donations`)
+                ]);
+
+                const beneficiaries = beneficiariesRes.data;
+                const payments = paymentsRes.data;
+                const medicalRecords = medicalRecordsRes.data;
+                const donations = donationsRes.data;
+
+                // Update DOM with summary data
+                document.getElementById('summaryCards').innerHTML = `
+                    <div class="col-md-3 summary-card">
+                        <h2>Total Beneficiaries</h2>
+                        <p>${beneficiaries.length}</p>
+                    </div>
+                    <div class="col-md-3 summary-card">
+                        <h2>Total Payments</h2>
+                        <p>${payments.length}</p>
+                    </div>
+                    <div class="col-md-3 summary-card">
+                        <h2>Total Medical Records</h2>
+                        <p>${medicalRecords.length}</p>
+                    </div>
+                    <div class="col-md-3 summary-card">
+                        <h2>Total Donations</h2>
+                        <p>${donations.length}</p>
+                    </div>
+                `;
+                
+                // Prepare data for charts
+                const paymentsByInstitution = payments.reduce((acc, payment) => {
+                    acc[payment.institution_name] = (acc[payment.institution_name] || 0) + payment.total_amount;
+                    return acc;
+                }, {});
+
+                const medicalCostsByCategory = medicalRecords.reduce((acc, record) => {
+                    acc.labCosts += record.lab_cost || 0;
+                    acc.drugsCosts += record.drugs_cost || 0;
+                    acc.consultationFees += record.consultation || 0;
+                    return acc;
+                }, { labCosts: 0, drugsCosts: 0, consultationFees: 0 });
+
+                // Render charts using the aggregated data
+                renderCharts(paymentsByInstitution, medicalCostsByCategory);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        // Function to render charts
+        function renderCharts(paymentsByInstitution, medicalCostsByCategory) {
+            // Payments Chart
+            const paymentsCtx = document.getElementById('paymentsChart').getContext('2d');
+            new Chart(paymentsCtx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(paymentsByInstitution),
+                    datasets: [{
+                        label: 'Payments by Institution',
+                        data: Object.values(paymentsByInstitution),
+                        backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc'],
+                        borderColor: ['#4e73df', '#1cc88a', '#36b9cc'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Medical Costs Chart
+            const medicalCostsCtx = document.getElementById('medicalCostsChart').getContext('2d');
+            new Chart(medicalCostsCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['Lab Costs', 'Drugs Costs', 'Consultation Fees'],
+                    datasets: [{
+                        label: 'Medical Costs Breakdown',
+                        data: Object.values(medicalCostsByCategory),
+                        backgroundColor: ['#ff6384', '#36a2eb', '#ffce56'],
+                        borderColor: ['#ff6384', '#36a2eb', '#ffce56'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(tooltipItem) {
+                                    return tooltipItem.label + ': ' + tooltipItem.raw;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Fetch data on page load
+        fetchData();
+    </script>
 </body>
 </html>
