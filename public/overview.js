@@ -1,29 +1,28 @@
-// JavaScript to fetch data and populate summary cards and charts
-const apiUrl = 'https://samuel-nest-restapi.onrender.com/api';
+async function fetchOverview() {
+    const apiUrl = 'https://samuel-nest-restapi.onrender.com/api';
 
-// Function to fetch summary data
-async function fetchSummaryData() {
     try {
-        const response = await axios.get(`${apiUrl}/summary`);
-        const summaryData = response.data;
+        const [beneficiariesRes, paymentsRes, medicalsRes, donationsRes] = await Promise.all([
+            axios.get(`${apiUrl}/beneficiaries`),
+            axios.get(`${apiUrl}/payments`),
+            axios.get(`${apiUrl}/medical-records`),
+            axios.get(`${apiUrl}/donations`)
+        ]);
 
-        // Example: Update DOM with summary data
-        document.getElementById('summaryCards').innerHTML = `
-            <div>Total Beneficiaries: ${summaryData.totalBeneficiaries}</div>
-            <div>Total Payments: ${summaryData.totalPayments}</div>
-            <div>Total Medical Records: ${summaryData.totalMedicalRecords}</div>
-            <div>Total Donations: ${summaryData.totalDonations}</div>
-        `;
-        
-        // Example: Render charts using summaryData
-        // Implement your charting library or custom code here
-        renderCharts(summaryData);
+        const beneficiaries = beneficiariesRes.data;
+        const payments = paymentsRes.data;
+        const medicals = medicalsRes.data;
+        const donations = donationsRes.data;
+
+        document.getElementById('totalBeneficiaries').textContent = beneficiaries.length;
+        document.getElementById('totalPayments').textContent = payments.length;
+        document.getElementById('totalMedicalRecords').textContent = medicals.length;
+        document.getElementById('totalDonations').textContent = donations.length;
+
+        // Add code for charts using charting library like Chart.js or similar
     } catch (error) {
-        console.error('Error fetching summary data:', error);
+        console.error('Error fetching overview data:', error);
     }
 }
 
-// Function to render charts (example)
-function renderCharts(data) {
-    // Implement chart rendering logic here
-}
+fetchOverview();
