@@ -3,16 +3,168 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Medical Records Page</title>
-    <!-- Include any CSS frameworks or stylesheets here -->
-    <link rel="stylesheet" href="styles.css">
+    <title>Medical Records</title>
+    <!-- Include Bootstrap CSS for styling (optional) -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
-    <h1>Medical Records Page</h1>
-    <div id="medicalRecordsTable"></div>
+    <div class="container mt-5">
+        <h1>Medical Records</h1>
+        <!-- Form for Adding or Updating Medical Record -->
+        <form id="medicalRecordForm">
+            <!-- Date -->
+            <div class="form-group">
+                <label for="date">Date</label>
+                <input type="date" class="form-control" id="date" name="date" required>
+            </div>
+            <!-- Names -->
+            <div class="form-group">
+                <label for="names">Name(s)</label>
+                <input type="text" class="form-control" id="names" name="names" required>
+            </div>
+            <!-- Hospital Number -->
+            <div class="form-group">
+                <label for="hosp_no">Hospital Number</label>
+                <input type="text" class="form-control" id="hosp_no" name="hosp_no" required>
+            </div>
+            <!-- Costs -->
+            <div class="form-row">
+                <!-- Lab Cost -->
+                <div class="form-group col-md-4">
+                    <label for="lab_cost">Lab Cost (USD)</label>
+                    <input type="number" step="0.01" class="form-control" id="lab_cost" name="lab_cost">
+                </div>
+                <!-- Drugs Cost -->
+                <div class="form-group col-md-4">
+                    <label for="drugs_cost">Drugs Cost (USD)</label>
+                    <input type="number" step="0.01" class="form-control" id="drugs_cost" name="drugs_cost">
+                </div>
+                <!-- Consultation Cost -->
+                <div class="form-group col-md-4">
+                    <label for="consultation">Consultation Cost (USD)</label>
+                    <input type="number" step="0.01" class="form-control" id="consultation" name="consultation">
+                </div>
+            </div>
+            <hr>
+            <!-- Optional Costs -->
+            <div class="form-row">
+                <!-- Utility Cost -->
+                <div class="form-group col-md-4">
+                    <label for="utility_cost">Utility Cost (USD)</label>
+                    <input type="number" step="0.01" class="form-control" id="utility_cost" name="utility_cost">
+                </div>
+                <!-- Professional Fee -->
+                <div class="form-group col-md-4">
+                    <label for="prof_fee">Professional Fee (USD)</label>
+                    <input type="number" step="0.01" class="form-control" id="prof_fee" name="prof_fee">
+                </div>
+                <!-- Bed Cost -->
+                <div class="form-group col-md-4">
+                    <label for="bed">Bed Cost (USD)</label>
+                    <input type="number" step="0.01" class="form-control" id="bed" name="bed">
+                </div>
+            </div>
+            <!-- Line Total -->
+            <div class="form-group">
+                <label for="line_total">Line Total (USD)</label>
+                <input type="number" step="0.01" class="form-control" id="line_total" name="line_total" readonly>
+            </div>
+            <!-- Beneficiary ID (Hidden Field) -->
+            <input type="hidden" id="beneficiary_id" name="beneficiary_id" value="">
+            <!-- Additional Information -->
+            <div class="form-group">
+                <label for="extra">Additional Information</label>
+                <textarea class="form-control" id="extra" name="extra" rows="3"></textarea>
+            </div>
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
 
-    <!-- Include any JavaScript libraries or scripts here -->
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script src="medicalRecords.js"></script>
+        <hr>
+
+        <!-- Search Medical Records -->
+        <h2>Search Medical Records</h2>
+        <form id="searchForm">
+            <div class="form-group">
+                <label for="searchTerm">Search by Name(s)</label>
+                <input type="text" class="form-control" id="searchTerm" name="searchTerm">
+            </div>
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+
+        <!-- Display Search Results -->
+        <div id="searchResults" class="mt-4"></div>
+    </div>
+
+    <!-- Include jQuery and Bootstrap JS (optional) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- JavaScript for Calculating Line Total -->
+    <script>
+        // Calculate Line Total based on input values
+        $('#lab_cost, #drugs_cost, #consultation, #utility_cost, #prof_fee, #bed').change(function() {
+            var labCost = parseFloat($('#lab_cost').val()) || 0;
+            var drugsCost = parseFloat($('#drugs_cost').val()) || 0;
+            var consultationCost = parseFloat($('#consultation').val()) || 0;
+            var utilityCost = parseFloat($('#utility_cost').val()) || 0;
+            var profFee = parseFloat($('#prof_fee').val()) || 0;
+            var bedCost = parseFloat($('#bed').val()) || 0;
+            var lineTotal = labCost + drugsCost + consultationCost + utilityCost + profFee + bedCost;
+            $('#line_total').val(lineTotal.toFixed(2));
+        });
+
+        // Submit Form Handling (Example using jQuery)
+        $('#medicalRecordForm').submit(function(event) {
+            event.preventDefault();
+            var formData = $(this).serialize();
+            $.ajax({
+                type: 'POST',
+                url: 'https://samuel-nest-restapi.onrender.com/api/medical-records',
+                data: formData,
+                success: function(response) {
+                    alert('Medical record added successfully!');
+                    $('#medicalRecordForm')[0].reset();
+                },
+                error: function(error) {
+                    alert('Error adding medical record. Please try again.');
+                    console.error('Error:', error);
+                }
+            });
+        });
+
+        // Search Form Handling (Example using jQuery)
+        $('#searchForm').submit(function(event) {
+            event.preventDefault();
+            var searchTerm = $('#searchTerm').val();
+            $.ajax({
+                type: 'GET',
+                url: 'https://samuel-nest-restapi.onrender.com/api/medical-records',
+                data: { names: searchTerm },
+                success: function(response) {
+                    displaySearchResults(response.data);
+                },
+                error: function(error) {
+                    alert('Error searching medical records. Please try again.');
+                    console.error('Error:', error);
+                }
+            });
+        });
+
+        // Display Search Results Function
+        function displaySearchResults(records) {
+            var html = '<h3>Search Results</h3>';
+            if (records.length === 0) {
+                html += '<p>No records found.</p>';
+            } else {
+                html += '<ul>';
+                records.forEach(function(record) {
+                    html += '<li>' + record.names + ' - ' + record.date + '</li>';
+                });
+                html += '</ul>';
+            }
+            $('#searchResults').html(html);
+        }
+    </script>
 </body>
 </html>
