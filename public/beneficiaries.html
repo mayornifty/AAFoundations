@@ -18,21 +18,25 @@
             <div class="form-group">
                 <label for="name">Name</label>
                 <input type="text" class="form-control" id="name" name="name" required>
+                <div class="invalid-feedback">Please enter a valid name.</div>
             </div>
             <!-- Phone Number -->
             <div class="form-group">
                 <label for="phone_no">Phone Number</label>
-                <input type="tel" class="form-control" id="phone_no" name="phone_no" required>
+                <input type="tel" class="form-control" id="phone_no" name="phone_no" pattern="[0-9]{10}" required>
+                <div class="invalid-feedback">Please enter a valid 10-digit phone number.</div>
             </div>
             <!-- Contact Address -->
             <div class="form-group">
                 <label for="contact_address">Contact Address</label>
                 <input type="text" class="form-control" id="contact_address" name="contact_address" required>
+                <div class="invalid-feedback">Please enter a contact address.</div>
             </div>
             <!-- Email Address -->
             <div class="form-group">
                 <label for="email_address">Email Address</label>
                 <input type="email" class="form-control" id="email_address" name="email_address">
+                <div class="invalid-feedback">Please enter a valid email address.</div>
             </div>
             <!-- Submit Button -->
             <button type="submit" class="btn btn-primary">Submit</button>
@@ -61,6 +65,10 @@
         // Submit Form Handling (Example using jQuery)
         $('#beneficiaryForm').submit(function(event) {
             event.preventDefault();
+            if (!this.checkValidity()) {
+                event.stopPropagation();
+                return;
+            }
             var formData = $(this).serialize();
             $.ajax({
                 type: 'POST',
@@ -75,6 +83,7 @@
                     console.error('Error:', error);
                 }
             });
+            $(this).addClass('was-validated');
         });
 
         // Search Form Handling (Example using jQuery)
