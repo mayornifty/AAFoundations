@@ -173,7 +173,7 @@
             
             beneficiaries.forEach(function(beneficiary) {
                 var editButton = '<button type="button" class="btn btn-primary btn-sm editBtn" data-id="' + beneficiary._id + '">Edit</button>';
-                var deleteButton = '<button type="button" class="btn btn-danger btn-sm deleteBtn" data-id="' + beneficiary._id + '" disabled>Delete</button>';
+                var deleteButton = '<button type="button" class="btn btn-danger btn-sm deleteBtn" data-id="' + beneficiary._id + '">Delete</button>';
                 table.row.add([
                     beneficiary.name,
                     '+234'+beneficiary.phone_no,

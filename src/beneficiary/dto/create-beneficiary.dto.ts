@@ -1,17 +1,17 @@
-import { IsEmail, IsNotEmpty, IsPhoneNumber } from 'class-validator';
+import { IsEmail, IsNotEmpty,IsOptional, IsPhoneNumber } from 'class-validator';
 
 export class CreateBeneficiaryDto {
   @IsNotEmpty()
   'name': string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsPhoneNumber('NG')
   'phone_no': string;
 
-  @IsNotEmpty()
+  @IsOptional()
   'contact_address': string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsEmail()
   'email_address': string;
 }

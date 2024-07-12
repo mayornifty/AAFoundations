@@ -13,9 +13,9 @@
         <h1>Welcome to Your Dashboard</h1>
         <div class="summary-cards">
             <div id="totalBeneficiaries" class="summary-card bg-blue">Total Beneficiaries: Loading...</div>
-            <div id="totalPayments" class="summary-card bg-green">Total Payments: Loading...</div>
+            <div id="totalPayments" class="summary-card bg-green">Total Student Payments: Loading...</div>
             <div id="totalMedicals" class="summary-card bg-purple">Total Medical Beneficiaries: Loading...</div>
-            <div id="totalDonations" class="summary-card bg-orange">Total Donations: Loading...</div>
+            <div id="totalDonations" class="summary-card bg-orange">Total Cash Donations: Loading...</div>
         </div>
         <div class="charts">
             <canvas id="paymentsChart"></canvas>
@@ -52,7 +52,7 @@
 
                 fetchData("/payments").then(data => {
                     if (Array.isArray(data)) {
-                        document.getElementById("totalPayments").textContent = `Total Payments: ${data.length}`;
+                        document.getElementById("totalPayments").textContent = `Total Student Payments: ${data.length}`;
                     }
                 });
 
@@ -64,7 +64,7 @@
 
                 fetchData("/donations").then(data => {
                     if (Array.isArray(data)) {
-                        document.getElementById("totalDonations").textContent = `Total Donations: ${data.length}`;
+                        document.getElementById("totalDonations").textContent = `Total Cash Donations: ${data.length}`;
                     }
                 });
             }

@@ -8,13 +8,13 @@ export class Beneficiary {
   @Prop({ type: SchemaTypes.String, required: true })
   name: string;
 
-  @Prop({ type: SchemaTypes.String, required: true })
+  @Prop({ type: SchemaTypes.String, required: false })
   phone_no: string;
 
-  @Prop({ type: SchemaTypes.String, required: true })
+  @Prop({ type: SchemaTypes.String, required: false })
   contact_address: string;
 
-  @Prop({ type: SchemaTypes.String, required: true, unique: true })
+  @Prop({ type: SchemaTypes.String, required: false, unique: true })
   email_address: string;
 }
 
