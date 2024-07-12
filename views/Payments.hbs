@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payments Management</title>
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" integrity="sha384-4LISF5TTJX/fLmGSxO53rV4miRxdg84mZsxmO8Rx5jGtp/LbrixFETvWa5a6sESd" crossorigin="anonymous">
+    <!-- Include Bootstrap CSS for styling -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Include DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
+    <!-- Include xlsx library for exporting to Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Payments Management</h1>
+        
+<!-- Add New Payment Form -->
+<form id="paymentForm" class="mb-5">
+    <div class="form-row">
+        <div class="form-group col-md-3">
+            <label for="date">Date</label>
+            <input type="date" class="form-control" id="date" name="date" required>
+        </div>
+        <div class="form-group col-md-3">
+            <label for="beneficiary">Beneficiary</label>
+            <select class="form-control" id="beneficiary" name="beneficiary_id" required>
+                <option value="">Select Beneficiary</option>
+            </select>
+        </div>
+        <div class="form-group col-md-3">
+            <label for="institution_name">Institution Name</label>
+            <input type="text" class="form-control" id="institution_name" name="institution_name" required>
+        </div>
+        <div class="form-group col-md-3">
+            <label for="programme_of_study">Programme of Study</label>
+            <input type="text" class="form-control" id="programme_of_study" name="programme_of_study" required>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-3">
+            <label for="level">Level</label>
+            <input type="text" class="form-control" id="level" name="level" required>
+        </div>
+        <div class="form-group col-md-3">
+            <label for="start_date">Start Date</label>
+            <input type="date" class="form-control" id="start_date" name="start_date" required>
+        </div>
+        <div class="form-group col-md-3">
+            <label for="end_date">End Date</label>
+            <input type="date" class="form-control" id="end_date" name="end_date" required>
+        </div>
+        <div class="form-group col-md-3">
+            <label for="phone_no">Phone Number</label>
+            <input type="text" class="form-control" id="phone_no" name="phone_no" required>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-3">
+            <label for="contact_address">Contact Address</label>
+            <input type="text" class="form-control" id="contact_address" name="contact_address" required>
+        </div>
+        <div class="form-group col-md-3">
+            <label for="email_address">Email Address</label>
+            <input type="email" class="form-control" id="email_address" name="email_address" required>
+        </div>
+        <div class="form-group col-md-3">
+            <label for="school_fees">School Fees</label>
+            <input type="number" class="form-control" id="school_fees" name="school_fees" required>
+        </div>
+        <div class="form-group col-md-3">
+            <label for="accommodation">Accommodation</label>
+            <input type="number" class="form-control" id="accommodation" name="accommodation" required>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-3">
+            <label for="books_handouts">Books and Handouts</label>
+            <input type="number" class="form-control" id="books_handouts" name="books_handouts" required>
+        </div>
+        <div class="form-group col-md-3">
+            <label for="institution_dues">Institution Dues</label>
+            <input type="number" class="form-control" id="institution_dues" name="institution_dues" required>
+        </div>
+        <div class="form-group col-md-3">
+            <label for="computer">Computer</label>
+            <input type="number" class="form-control" id="computer" name="computer" required>
+        </div>
+        <div class="form-group col-md-3">
+            <label for="allowance">Allowance</label>
+            <input type="number" class="form-control" id="allowance" name="allowance" required>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-3">
+            <label for="others">Others</label>
+            <input type="number" class="form-control" id="others" name="others" required>
+        </div>
+        <div class="form-group col-md-3">
+            <label for="total_amount">Total Amount</label>
+            <input type="number" class="form-control" id="total_amount" name="total_amount" readonly required>
+        </div>
+        <div class="form-group col-md-3">
+            <label for="account_no">Account Number</label>
+            <input type="text" class="form-control" id="account_no" name="account_no" required>
+        </div>
+        <div class="form-group col-md-3">
+            <label for="bank">Bank</label>
+            <input type="text" class="form-control" id="bank" name="bank" required>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <label for="comments">Comments</label>
+            <textarea class="form-control" id="comments" name="comments" required></textarea>
+        </div>
+        <div class="form-group col-md-6">
+            <label for="extra">Extra</label>
+            <textarea class="form-control" id="extra" name="extra"></textarea>
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+        
+        <!-- Payments Table -->
+        <h2>Payments</h2>
+          <button id="exportButton" class="btn btn-success mb-3">
+                    Export to Excel <i class="bi bi-share"></i>
+                </button>
+        <table id="paymentsTable" class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Beneficiary</th>
+                    <th>Institution Name</th>
+                    <th>Programme of Study</th>
+                    <th>Level</th>
+                    
+                    <th>Total Amount</th>
+                    
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="paymentsTableBody">
+                <!-- Table rows will be dynamically populated -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Include Bootstrap JS -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Include DataTables JS -->
+    <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+    <script>
+        // Function to fetch beneficiaries and populate dropdown
+        function fetchBeneficiaries() {
+            $.ajax({
+                type: 'GET',
+                url: '/api/beneficiaries',
+                success: function(response) {
+                    var beneficiaries = response.data;
+                    var dropdown = $('#beneficiary');
+                    dropdown.empty();
+                    dropdown.append('<option value="">Select Beneficiary</option>');
+                    $.each(beneficiaries, function(index, beneficiary) {
+                        dropdown.append('<option value="' + beneficiary._id + '">' + beneficiary.name + '</option>');
+                    });
+                },
+                error: function(error) {
+                    console.error('Error fetching beneficiaries:', error);
+                    alert('Error fetching beneficiaries. Please try again.');
+                }
+            });
+        }
+
+        // Call fetchBeneficiaries function on document ready
+        $(document).ready(function() {
+            fetchBeneficiaries();
+            fetchPayments(); // Fetch payments initially
+
+            // Initialize DataTable
+            $('#paymentsTable').DataTable();
+        });
+
+        // Function to fetch payments and display in the table
+        function fetchPayments() {
+            $.ajax({
+                type: 'GET',
+                url: '/api/payments',
+                success: function(response) {
+                    displayPayments(response.data);
+                },
+                error: function(error) {
+                    console.error('Error fetching payments:', error);
+                    alert('Error fetching payments. Please try again.');
+                }
+            });
+        }
+
+       function displayPayments(payments) {
+    var table = $('#paymentsTable').DataTable();
+    table.clear().draw(); // Clear existing table data
+
+    // Function to fetch beneficiary name by ID
+    function fetchBeneficiaryName(beneficiaryId) {
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                type: 'GET',
+                url: '/api/beneficiaries/' + beneficiaryId,
+                success: function(response) {
+                    resolve(response.data.name);
+                },
+                error: function(error) {
+                    console.error('Error fetching beneficiary:', error);
+                    reject('Unknown Beneficiary');
+                }
+            });
+        });
+    }
+
+    $.each(payments, function(index, payment) {
+        // Fetch beneficiary name asynchronously
+        fetchBeneficiaryName(payment.beneficiary_id)
+            .then(beneficiaryName => {
+                var row = [
+                    formatDate(payment.date),
+                    beneficiaryName, // Display fetched beneficiary name
+                    payment.institution_name,
+                    payment.programme_of_study,
+                    payment.level,
+                  
+                   {{!--  formatDate(payment.start_date),
+                    formatDate(payment.end_date),
+                    payment.phone_no,
+                    payment.contact_address,
+                    payment.email_address,
+                    parseFloat(payment.school_fees.$numberDecimal),
+                    parseFloat(payment.accommodation.$numberDecimal),
+                    parseFloat(payment.books_handouts.$numberDecimal),
+                    parseFloat(payment.institution_dues.$numberDecimal),
+                    parseFloat(payment.computer.$numberDecimal),
+                    parseFloat(payment.allowance.$numberDecimal),
+                    parseFloat(payment.others.$numberDecimal), --}}
+
+                    parseFloat(payment.total_amount.$numberDecimal),
+                 {{!--    payment.account_no,
+                    payment.bank,
+                    payment.comments,
+                    payment.extra, --}}
+                    '<button class="btn btn-sm btn-primary btn-edit" data-id="' + payment._id + '">Edit</button> ' +
+                    '<button class="btn btn-sm btn-danger btn-delete" data-id="' + payment._id + '" disabled>Delete</button>'
+                ];
+                table.row.add(row).draw();
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    });
+}
+
+
+        // Event listener for edit button click
+        $('#paymentsTable').on('click', '.btn-edit', function() {
+            var paymentId = $(this).data('id');
+            // Implement your edit logic here, e.g., opening a modal with pre-filled data
+            alert('Edit clicked for payment ID: ' + paymentId);
+        });
+
+        // Event listener for delete button click
+        $('#paymentsTable').on('click', '.btn-delete', function() {
+            var paymentId = $(this).data('id');
+            if (confirm('Are you sure you want to delete this payment?')) {
+                $.ajax({
+                    type: 'DELETE',
+                    url: '/api/payments/' + paymentId,
+                    success: function(response) {
+                        alert('Payment deleted successfully!');
+                        fetchPayments(); // Refresh table after deletion
+                    },
+                    error: function(error) {
+                        console.error('Error deleting payment:', error);
+                        alert('Error deleting payment. Please try again.');
+                    }
+                });
+            }
+        });
+
+        // Function to format date as "YYYY-MM-DD"
+        function formatDate(dateString) {
+            var date = new Date(dateString);
+            return date.toISOString().split('T')[0];
+        }
+
+        // Submit Form Handling
+        $('#paymentForm').submit(function(event) {
+            event.preventDefault();
+            var formData = {
+                date: $('#date').val(),
+                beneficiary_id: $('#beneficiary').val(),
+                institution_name: $('#institution_name').val(),
+                programme_of_study: $('#programme_of_study').val(),
+                level: $('#level').val(),
+                start_date: $('#start_date').val(),
+                end_date: $('#end_date').val(),
+                phone_no: $('#phone_no').val(),
+                contact_address: $('#contact_address').val(),
+                email_address: $('#email_address').val(),
+                school_fees: $('#school_fees').val(),
+                accommodation: $('#accommodation').val(),
+                books_handouts: $('#books_handouts').val(),
+                institution_dues: $('#institution_dues').val(),
+                computer: $('#computer').val(),
+                allowance: $('#allowance').val(),
+                others: $('#others').val(),
+                total_amount: $('#total_amount').val(),
+                account_no: $('#account_no').val(),
+                bank: $('#bank').val(),
+                comments: $('#comments').val(),
+                extra: $('#extra').val()
+            };
+
+            $.ajax({
+                type: 'POST',
+                url: '/api/payments',
+                data: formData,
+                success: function(response) {
+                    alert('Payment added successfully!');
+                    fetchPayments(); // Refresh table after addition
+                    $('#paymentForm')[0].reset(); // Clear form fields
+                },
+                error: function(error) {
+                    console.error('Error adding payment:', error);
+                    alert('Error adding payment. Please try again.');
+                }
+            });
+        });
+
+        //script to populate total amount
+
+         document.addEventListener('DOMContentLoaded', function() {
+        const inputs = [
+            'school_fees', 'accommodation', 'books_handouts', 
+            'institution_dues', 'computer', 'allowance', 'others'
+        ];
+        
+        inputs.forEach(id => {
+            document.getElementById(id).addEventListener('input', calculateTotal);
+        });
+
+        function calculateTotal() {
+            let total = 0;
+            inputs.forEach(id => {
+                const value = parseFloat(document.getElementById(id).value) || 0;
+                total += value;
+            });
+            document.getElementById('total_amount').value = total.toFixed(2);
+        }
+    });
+
+
+ // Function to export table data to Excel
+        function exportTableToExcel() {
+            var table = document.getElementById('paymentsTable');
+            var workbook = XLSX.utils.table_to_book(table, { sheet: "Sheet 1" });
+            XLSX.writeFile(workbook, 'payments.xlsx');
+        }
+
+        // Event listener for export button click
+        $('#exportButton').on('click', function() {
+            exportTableToExcel();
+        });
+    
+    </script>
+</body>
+</html>

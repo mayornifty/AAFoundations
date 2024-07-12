@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Include DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.4/css/jquery.dataTables.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to Your Dashboard</h1>
+        <div class="summary-cards">
+            <div id="totalBeneficiaries" class="summary-card bg-blue">Total Beneficiaries: Loading...</div>
+            <div id="totalPayments" class="summary-card bg-green">Total Payments: Loading...</div>
+            <div id="totalMedicals" class="summary-card bg-purple">Total Medical Beneficiaries: Loading...</div>
+            <div id="totalDonations" class="summary-card bg-orange">Total Donations: Loading...</div>
+        </div>
+        <div class="charts">
+            <canvas id="paymentsChart"></canvas>
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <!-- Include DataTables JavaScript -->
+    <script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const apiUrl = "/api";
+
+            // Function to fetch data and handle errors
+            async function fetchData(endpoint) {
+                try {
+                    const response = await fetch(apiUrl + endpoint);
+                    const result = await response.json();
+                    return result.data;
+                } catch (error) {
+                    console.error(`Error fetching data from ${endpoint}:`, error);
+                    return null;
+                }
+            }
+
+            // Fetch and display the total counts
+            function displayTotalCounts() {
+                fetchData("/beneficiaries").then(data => {
+                    if (Array.isArray(data)) {
+                        document.getElementById("totalBeneficiaries").textContent = `Total Beneficiaries: ${data.length}`;
+                    }
+                });
+
+                fetchData("/payments").then(data => {
+                    if (Array.isArray(data)) {
+                        document.getElementById("totalPayments").textContent = `Total Payments: ${data.length}`;
+                    }
+                });
+
+                fetchData("/medical-records").then(data => {
+                    if (Array.isArray(data)) {
+                        document.getElementById("totalMedicals").textContent = `Medical Beneficiaries: ${data.length}`;
+                    }
+                });
+
+                fetchData("/donations").then(data => {
+                    if (Array.isArray(data)) {
+                        document.getElementById("totalDonations").textContent = `Total Donations: ${data.length}`;
+                    }
+                });
+            }
+
+            // Responsive Chart for Payments
+            const paymentsCtx = document.getElementById("paymentsChart").getContext("2d");
+            fetchData("/payments").then(data => {
+                if (Array.isArray(data)) {
+                    const institutions = {};
+                    data.forEach(payment => {
+                        institutions[payment.institution_name] = (institutions[payment.institution_name] || 0) + 1;
+                    });
+                    const labels = Object.keys(institutions);
+                    const values = Object.values(institutions);
+
+                    new Chart(paymentsCtx, {
+                        type: "bar",
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: "Payments by Institution",
+                                data: values,
+                                backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"]
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                x: {
+                                    beginAtZero: true
+                                },
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+
+            // Initial data load
+            displayTotalCounts();
+        });
+    </script>
+</body>
+</html>

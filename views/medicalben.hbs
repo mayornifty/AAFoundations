@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Records Management</title>
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <!-- Include Bootstrap CSS for styling -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Include DataTables CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Medical Beneficiaries</h1>
+
+        <!-- Button to trigger modal -->
+        <button type="button" class="btn btn-primary mb-3" data-toggle="modal" data-target="#medicalRecordModal">
+            Add New Medical Record
+        </button>
+        
+        <!-- Medical Records Table -->
+        {{!-- <h2>Medical Beneficiaries Records</h2> --}}
+        <table id="medicalRecordsTable" class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Beneficiary</th>
+                    <th>Hospital Number</th>
+                    <th>Lab Cost</th>
+                    <th>Drugs Cost</th>
+                    <th>Consultation Fee</th>
+                    <th>Utility Cost</th>
+                    <th>Professional Fee</th>
+                    <th>Bed Cost</th>
+                    <th>Line Total</th>
+                    <th>Extra Information</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="medicalRecordsTableBody">
+                <!-- Table rows will be dynamically populated -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="medicalRecordModal" tabindex="-1" role="dialog" aria-labelledby="medicalRecordModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form id="medicalRecordForm">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="medicalRecordModalLabel">Add New Item</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="recordId" name="recordId"> <!-- Hidden input for record ID -->
+
+                        <div class="row">
+                            <!-- Column 1 -->
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="date">Date</label>
+                                    <input type="date" class="form-control" id="date" name="date" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="beneficiary">Beneficiary</label>
+                                    <select class="form-control" id="beneficiary" name="beneficiary_id" required>
+                                        <option value="">Select Beneficiary</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="hosp_no">Hospital Number</label>
+                                    <input type="text" class="form-control" id="hosp_no" name="hosp_no" required>
+                                </div>
+                            </div>
+                            <!-- Column 2 -->
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="lab_cost">Lab Cost</label>
+                                    <input type="number" step="0.01" class="form-control cost-input" id="lab_cost" name="lab_cost" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="drugs_cost">Drugs Cost</label>
+                                    <input type="number" step="0.01" class="form-control cost-input" id="drugs_cost" name="drugs_cost" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="consultation">Consultation Fee</label>
+                                    <input type="number" step="0.01" class="form-control cost-input" id="consultation" name="consultation" required>
+                                </div>
+                            </div>
+                            <!-- Column 3 -->
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="utility_cost">Utility Cost</label>
+                                    <input type="number" step="0.01" class="form-control cost-input" id="utility_cost" name="utility_cost">
+                                </div>
+                                <div class="form-group">
+                                    <label for="prof_fee">Professional Fee</label>
+                                    <input type="number" step="0.01" class="form-control cost-input" id="prof_fee" name="prof_fee">
+                                </div>
+                                <div class="form-group">
+                                    <label for="bed">Bed Cost</label>
+                                    <input type="number" step="0.01" class="form-control cost-input" id="bed" name="bed">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="line_total">Line Total</label>
+                            <input type="number" step="0.01" class="form-control" id="line_total" name="line_total" readonly required>
+                        </div>
+                        <div class="form-group">
+                            <label for="extra">Extra Information</label>
+                            <textarea class="form-control" id="extra" name="extra"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" id="saveChangesBtn">Add New Item</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include Bootstrap JS -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Include DataTables JS -->
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.js"></script>
+    <script>
+        // Function to fetch beneficiaries and populate dropdown
+        function fetchBeneficiaries() {
+            $.ajax({
+                type: 'GET',
+                url: '/api/beneficiaries',
+                success: function(response) {
+                    var beneficiaries = response.data;
+                    var dropdown = $('#beneficiary');
+                    dropdown.empty();
+                    dropdown.append('<option value="">Select Beneficiary</option>');
+                    $.each(beneficiaries, function(index, beneficiary) {
+                        dropdown.append('<option value="' + beneficiary._id + '">' + beneficiary.name + '</option>');
+                    });
+                },
+                error: function(error) {
+                    console.error('Error fetching beneficiaries:', error);
+                    alert('Error fetching beneficiaries. Please try again.');
+                }
+            });
+        }
+
+        // Call fetchBeneficiaries function on document ready
+        $(document).ready(function() {
+            fetchBeneficiaries();
+            fetchMedicalRecords(); // Fetch medical records initially
+
+            // Initialize DataTables
+            $('#medicalRecordsTable').DataTable();
+        });
+
+        // Function to fetch medical records and display in the table
+        function fetchMedicalRecords() {
+            $.ajax({
+                type: 'GET',
+                url: '/api/medical-records',
+                success: function(response) {
+                    displayMedicalRecords(response.data);
+                },
+                error: function(error) {
+                    console.error('Error fetching medical records:', error);
+                    alert('Error fetching medical records. Please try again.');
+                }
+            });
+        }
+
+        // Function to display medical records in the table
+        function displayMedicalRecords(medicalRecords) {
+            var table = $('#medicalRecordsTable').DataTable();
+            table.clear().draw(); // Clear existing table and redraw
+
+            medicalRecords.forEach(function(record) {
+                var labCost = parseFloat(record.lab_cost.$numberDecimal).toFixed(2);
+                var drugsCost = parseFloat(record.drugs_cost.$numberDecimal).toFixed(2);
+                var consultation = parseFloat(record.consultation.$numberDecimal).toFixed(2);
+                var utilityCost = parseFloat(record.utility_cost.$numberDecimal).toFixed(2);
+                var profFee = parseFloat(record.prof_fee.$numberDecimal).toFixed(2);
+                var bedCost = parseFloat(record.bed.$numberDecimal).toFixed(2);
+                var lineTotal = parseFloat(record.line_total.$numberDecimal).toFixed(2);
+
+                var row = [
+                    formatDate(record.date),
+                    record.names,
+                    record.hosp_no,
+                    labCost,
+                    drugsCost,
+                    consultation,
+                    utilityCost,
+                    profFee,
+                    bedCost,
+                    lineTotal,
+                    record.extra,
+                    '<button class="btn btn-sm btn-primary btn-edit" data-id="' + record._id + '">Edit</button> ' +
+                    '<button class="btn btn-sm btn-danger btn-delete" data-id="' + record._id + '">Delete</button>'
+                ];
+                table.row.add(row).draw(false);
+            });
+        }
+
+        // Format date as "YYYY-MM-DD"
+        function formatDate(dateString) {
+            var date = new Date(dateString);
+            return date.toISOString().split('T')[0];
+        }
+
+        // Update Line Total on input change
+        function updateLineTotal() {
+            var total = 0;
+            $('.cost-input').each(function() {
+                var value = parseFloat($(this).val()) || 0;
+                total += value;
+            });
+            $('#line_total').val(total.toFixed(2));
+        }
+
+        // Call updateLineTotal() on input change
+        $('.cost-input').on('input', function() {
+            updateLineTotal();
+        });
+
+        // Submit Form Handling
+        $('#medicalRecordForm').submit(function(event) {
+            event.preventDefault();
+            var recordId = $('#recordId').val();
+            var url = '/api/medical-records';
+            var method = 'POST';
+
+            if (recordId) {
+                url += '/' + recordId;
+                method = 'PUT';
+            }
+
+            var beneficiaryName = $('#beneficiary option:selected').text();
+            var formData = {
+                date: $('#date').val(),
+                beneficiary_id: $('#beneficiary').val(),
+                names: beneficiaryName,
+                hosp_no: $('#hosp_no').val(),
+                lab_cost: parseFloat($('#lab_cost').val()),
+                drugs_cost: parseFloat($('#drugs_cost').val()),
+                consultation: parseFloat($('#consultation').val()),
+                utility_cost: parseFloat($('#utility_cost').val()),
+                prof_fee: parseFloat($('#prof_fee').val()),
+                bed: parseFloat($('#bed').val()),
+                line_total: parseFloat($('#line_total').val()),
+                extra: $('#extra').val()
+            };
+
+            $.ajax({
+                type: method,
+                url: url,
+                data: formData,
+                success: function(response) {
+                    alert('Medical record ' + (recordId ? 'updated' : 'added') + ' successfully!');
+                    fetchMedicalRecords(); // Refresh table after addition/update
+                    $('#medicalRecordForm')[0].reset(); // Clear form fields
+                    $('#recordId').val(''); // Reset recordId field
+                    $('#medicalRecordModal').modal('hide'); // Hide the modal after submission
+                },
+                error: function(error) {
+                    console.error('Error ' + (recordId ? 'updating' : 'adding') + ' medical record:', error);
+                    alert('Error ' + (recordId ? 'updating' : 'adding') + ' medical record. Please try again.');
+                }
+            });
+        });
+
+        // Function to handle edit button click
+        $('#medicalRecordsTable').on('click', '.btn-edit', function() {
+            var recordId = $(this).data('id');
+            $('#recordId').val(recordId); // Set recordId in hidden input
+
+            $.ajax({
+                type: 'GET',
+                url: '/api/medical-records/' + recordId,
+                success: function(response) {
+                    var record = response.data;
+                    $('#date').val(formatDate(record.date));
+                    $('#beneficiary').val(record.beneficiary_id);
+                    $('#hosp_no').val(record.hosp_no);
+                    $('#lab_cost').val(parseFloat(record.lab_cost.$numberDecimal).toFixed(2));
+                    $('#drugs_cost').val(parseFloat(record.drugs_cost.$numberDecimal).toFixed(2));
+                    $('#consultation').val(parseFloat(record.consultation.$numberDecimal).toFixed(2));
+                    $('#utility_cost').val(parseFloat(record.utility_cost.$numberDecimal).toFixed(2));
+                    $('#prof_fee').val(parseFloat(record.prof_fee.$numberDecimal).toFixed(2));
+                    $('#bed').val(parseFloat(record.bed.$numberDecimal).toFixed(2));
+                    $('#line_total').val(parseFloat(record.line_total.$numberDecimal).toFixed(2));
+                    $('#extra').val(record.extra);
+
+                    $('#medicalRecordModalLabel').text('Edit Item');
+                    $('#saveChangesBtn').text('Save Changes');
+                    $('#medicalRecordModal').modal('show');
+                },
+                error: function(error) {
+                    console.error('Error fetching medical record:', error);
+                    alert('Error fetching medical record. Please try again.');
+                }
+            });
+        });
+
+        // Function to handle delete button click
+        $('#medicalRecordsTable').on('click', '.btn-delete', function() {
+            var recordId = $(this).data('id');
+            if (confirm('Are you sure you want to delete this medical record?')) {
+                $.ajax({
+                    type: 'DELETE',
+                    url: '/api/medical-records/' + recordId,
+                    success: function(response) {
+                        alert('Medical record deleted successfully!');
+                        fetchMedicalRecords(); // Refresh table after deletion
+                    },
+                    error: function(error) {
+                        console.error('Error deleting medical record:', error);
+                        alert('Error deleting medical record. Please try again.');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

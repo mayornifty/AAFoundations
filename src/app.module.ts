@@ -6,6 +6,7 @@ import { BeneficiaryModule } from './beneficiary/beneficiary.module';
 import { DonationModule } from './donation/donation.module';
 import { MedicalModule } from './medical/medical.module';
 import { PaymentModule } from './payment/payment.module';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -23,7 +24,7 @@ import { PaymentModule } from './payment/payment.module';
     MedicalModule,
     PaymentModule,
   ],
-  controllers: [],
+  controllers: [AppController],
   providers: [],
 })
 export class AppModule {}

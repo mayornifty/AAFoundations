@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 import * as path from 'path';
+import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
@@ -18,11 +19,15 @@ async function bootstrap() {
 
   // Serve static files from the 'public' directory
   app.useStaticAssets(path.join(__dirname, '..', 'public'));
+  app.setBaseViewsDir(join(__dirname, '..', 'views'));
+  app.setViewEngine('hbs');
+
 
   // Apply global validation pipe
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
 
   await app.listen(port);
+  
   console.log(`Listening on port ${port}`);
 }
 bootstrap();
