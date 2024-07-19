@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Testing</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            padding-top: 20px;
+        }
+        input[type="text"], input[type="button"] {
+            padding: 10px;
+            margin: 5px 0;
+            width: 100%;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>API Testing</h1>
+
+        <!-- Get All Beneficiaries -->
+        <h2>Get All Beneficiaries</h2>
+        <input type="button" value="Fetch Beneficiaries" onclick="fetchBeneficiaries()">
+        <textarea id="beneficiariesResult"></textarea>
+
+        <!-- Create Beneficiary -->
+        <h2>Create Beneficiary</h2>
+        <input type="text" id="beneficiaryName" placeholder="Name">
+        <input type="text" id="beneficiaryPhone" placeholder="Phone Number">
+        <input type="text" id="beneficiaryAddress" placeholder="Contact Address">
+        <input type="text" id="beneficiaryEmail" placeholder="Email Address">
+        <input type="button" value="Create Beneficiary" onclick="createBeneficiary()">
+        <textarea id="createResult"></textarea>
+
+        <!-- Get Beneficiary -->
+        <h2>Get Beneficiary</h2>
+        <input type="text" id="beneficiaryId" placeholder="Beneficiary ID">
+        <input type="button" value="Fetch Beneficiary" onclick="fetchBeneficiary()">
+        <textarea id="beneficiaryResult"></textarea>
+
+        <!-- Update Beneficiary -->
+        <h2>Update Beneficiary</h2>
+        <input type="text" id="updateBeneficiaryId" placeholder="Beneficiary ID">
+        <input type="text" id="updateBeneficiaryName" placeholder="Updated Name">
+        <input type="button" value="Update Beneficiary" onclick="updateBeneficiary()">
+        <textarea id="updateResult"></textarea>
+    </div>
+
+    <script>
+        const apiUrl = 'https://samuel-nest-restapi.onrender.com/api';
+
+        // Fetch all beneficiaries
+        function fetchBeneficiaries() {
+            fetch(`${apiUrl}/beneficiaries`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('beneficiariesResult').value = JSON.stringify(data, null, 2);
+                })
+                .catch(error => {
+                    document.getElementById('beneficiariesResult').value = 'Error fetching beneficiaries: ' + error;
+                });
+        }
+
+        // Create a new beneficiary
+        function createBeneficiary() {
+            const name = document.getElementById('beneficiaryName').value;
+            const phone_no = document.getElementById('beneficiaryPhone').value;
+            const contact_address = document.getElementById('beneficiaryAddress').value;
+            const email_address = document.getElementById('beneficiaryEmail').value;
+
+            fetch(`${apiUrl}/beneficiaries`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name, phone_no, contact_address, email_address })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('createResult').value = JSON.stringify(data, null, 2);
+                })
+                .catch(error => {
+                    document.getElementById('createResult').value = 'Error creating beneficiary: ' + error;
+                });
+        }
+
+        // Fetch a specific beneficiary by ID
+        function fetchBeneficiary() {
+            const id = document.getElementById('beneficiaryId').value;
+
+            fetch(`${apiUrl}/beneficiaries/${id}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('beneficiaryResult').value = JSON.stringify(data, null, 2);
+                })
+                .catch(error => {
+                    document.getElementById('beneficiaryResult').value = 'Error fetching beneficiary: ' + error;
+                });
+        }
+
+        // Update a specific beneficiary
+        function updateBeneficiary() {
+            const id = document.getElementById('updateBeneficiaryId').value;
+            const name = document.getElementById('updateBeneficiaryName').value;
+
+            fetch(`${apiUrl}/beneficiaries/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('updateResult').value = JSON.stringify(data, null, 2);
+                })
+                .catch(error => {
+                    document.getElementById('updateResult').value = 'Error updating beneficiary: ' + error;
+                });
+        }
+    </script>
+</body>
+</html>

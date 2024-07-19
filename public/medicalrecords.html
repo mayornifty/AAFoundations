@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Records</title>
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <!-- Include Bootstrap CSS for styling (optional) -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Add New Medical Record</h1>
+        <!-- Medical Records Form -->
+        <form id="medicalRecordForm">
+            <!-- Date -->
+            <div class="form-group">
+                <label for="date">Date</label>
+                <input type="date" class="form-control" id="date" name="date" required>
+            </div>
+            <!-- Beneficiary Name Dropdown -->
+            <div class="form-group">
+                <label for="beneficiary">Beneficiary</label>
+                <select class="form-control" id="beneficiary" name="beneficiary_id" required>
+                    <option value="">Select Beneficiary</option>
+                    <!-- Options will be dynamically populated using JavaScript -->
+                </select>
+            </div>
+            <!-- Hospital Number -->
+            <div class="form-group">
+                <label for="hosp_no">Hospital Number</label>
+                <input type="text" class="form-control" id="hosp_no" name="hosp_no" required>
+            </div>
+            <!-- Lab Cost -->
+            <div class="form-group">
+                <label for="lab_cost">Lab Cost</label>
+                <input type="number" step="0.01" class="form-control" id="lab_cost" name="lab_cost" required>
+            </div>
+            <!-- Drugs Cost -->
+            <div class="form-group">
+                <label for="drugs_cost">Drugs Cost</label>
+                <input type="number" step="0.01" class="form-control" id="drugs_cost" name="drugs_cost" required>
+            </div>
+            <!-- Consultation Fee -->
+            <div class="form-group">
+                <label for="consultation">Consultation Fee</label>
+                <input type="number" step="0.01" class="form-control" id="consultation" name="consultation" required>
+            </div>
+            <!-- Utility Cost -->
+            <div class="form-group">
+                <label for="utility_cost">Utility Cost</label>
+                <input type="number" step="0.01" class="form-control" id="utility_cost" name="utility_cost">
+            </div>
+            <!-- Professional Fee -->
+            <div class="form-group">
+                <label for="prof_fee">Professional Fee</label>
+                <input type="number" step="0.01" class="form-control" id="prof_fee" name="prof_fee">
+            </div>
+            <!-- Bed Cost -->
+            <div class="form-group">
+                <label for="bed">Bed Cost</label>
+                <input type="number" step="0.01" class="form-control" id="bed" name="bed">
+            </div>
+            <!-- Line Total -->
+            <div class="form-group">
+                <label for="line_total">Line Total</label>
+                <input type="number" step="0.01" class="form-control" id="line_total" name="line_total" required>
+            </div>
+            <!-- Extra Information -->
+            <div class="form-group">
+                <label for="extra">Extra Information</label>
+                <textarea class="form-control" id="extra" name="extra"></textarea>
+            </div>
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+
+    <!-- Include Bootstrap JS (optional) -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- JavaScript for Handling Form Submissions and Dropdown Population -->
+    <script>
+        $(document).ready(function() {
+            // Function to fetch beneficiaries and populate dropdown
+            function fetchBeneficiaries() {
+                $.ajax({
+                    type: 'GET',
+                    url: 'https://samuel-nest-restapi.onrender.com/api/beneficiaries',
+                    success: function(response) {
+                        var beneficiaries = response.data;
+                        var dropdown = $('#beneficiary');
+                        dropdown.empty();
+                        dropdown.append('<option value="">Select Beneficiary</option>');
+                        $.each(beneficiaries, function(index, beneficiary) {
+                            dropdown.append('<option value="' + beneficiary._id + '">' + beneficiary.name + '</option>');
+                        });
+                    },
+                    error: function(error) {
+                        console.error('Error fetching beneficiaries:', error);
+                        alert('Error fetching beneficiaries. Please try again.');
+                    }
+                });
+            }
+
+            // Call fetchBeneficiaries function on document ready
+            fetchBeneficiaries();
+
+            // Submit Form Handling
+            $('#medicalRecordForm').submit(function(event) {
+                event.preventDefault();
+                var formData = {
+                    date: $('#date').val(),
+                    names: $('#beneficiary option:selected').text(),
+                    hosp_no: $('#hosp_no').val(),
+                    lab_cost: parseFloat($('#lab_cost').val()),
+                    drugs_cost: parseFloat($('#drugs_cost').val()),
+                    consultation: parseFloat($('#consultation').val()),
+                    utility_cost: parseFloat($('#utility_cost').val()),
+                    prof_fee: parseFloat($('#prof_fee').val()),
+                    bed: parseFloat($('#bed').val()),
+                    line_total: parseFloat($('#line_total').val()),
+                    beneficiary_id: $('#beneficiary').val(),
+                    extra: $('#extra').val()
+                };
+
+                $.ajax({
+                    type: 'POST',
+                    url: 'https://samuel-nest-restapi.onrender.com/api/medical-records',
+                    data: formData,
+                    success: function(response) {
+                        alert('Medical record added successfully!');
+                        $('#medicalRecordForm')[0].reset();
+                    },
+                    error: function(error) {
+                        console.error('Error adding medical record:', error);
+                        alert('Error adding medical record. Please try again.');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

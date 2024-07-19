@@ -26,6 +26,9 @@ async function bootstrap() {
   // Apply global validation pipe
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
 
+  // Serve static files from the 'public' directory
+  app.useStaticAssets(join(__dirname, '..', 'public'));
+
   await app.listen(port);
   
   console.log(`Listening on port ${port}`);
