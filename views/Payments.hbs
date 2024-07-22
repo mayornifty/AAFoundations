@@ -252,7 +252,7 @@
                     payment.bank,
                     payment.comments,
                     payment.extra, --}}
-                    '<button class="btn btn-sm btn-primary btn-edit" data-id="' + payment._id + '">Edit</button> ' +
+                    '<button class="btn btn-sm btn-primary btn-edit" data-id="' + payment._id + '" disabled>Edit</button> ' +
                     '<button class="btn btn-sm btn-danger btn-delete" data-id="' + payment._id + '" disabled>Delete</button>'
                 ];
                 table.row.add(row).draw();

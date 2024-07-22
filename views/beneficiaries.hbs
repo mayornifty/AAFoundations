@@ -250,7 +250,7 @@
                         table.clear().draw();
                         beneficiaries.forEach(function(beneficiary) {
                             var viewButton = '<button type="button" class="btn btn-info btn-sm viewBtn" data-id="' + beneficiary._id + '"><i class="bi bi-eye"></i></button>';
-                            var editButton = '<button type="button" class="btn btn-warning btn-sm editBtn" data-id="' + beneficiary._id + '"><i class="bi bi-pencil"></i></button>';
+                            var editButton = '<button type="button" class="btn btn-warning btn-sm editBtn" data-id="' + beneficiary._id + '" disabled><i class="bi bi-pencil"></i></button>';
                             var deleteButton = '<button type="button" class="btn btn-danger btn-sm deleteBtn" data-id="' + beneficiary._id + '" disabled><i class="bi bi-trash"></i></button>';
                             table.row.add([
                                 beneficiary.name,
