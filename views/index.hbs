@@ -11,12 +11,63 @@
 <body>
     <div class="container">
         <h1>Welcome to Your Dashboard</h1>
-        <div class="summary-cards">
-            <div id="totalBeneficiaries" class="summary-card bg-blue">Total Beneficiaries: Loading...</div>
-            <div id="totalPayments" class="summary-card bg-green">Total Student Payments: Loading...</div>
-            <div id="totalMedicals" class="summary-card bg-purple">Total Medical Beneficiaries: Loading...</div>
-            <div id="totalDonations" class="summary-card bg-orange">Total Cash Donations: Loading...</div>
+
+        
+  <div class="row">
+    <div class="col-md-6 mb-4">
+      <div class="card">
+        <div class="card-header text-white bg-blue" id="TotalBen">
+          Total Beneficiaries
         </div>
+        <div class="card-body">
+          <blockquote class="blockquote mb-0">
+            <p id="totalBeneficiaries">Loading...</p>
+          </blockquote>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+      <div class="card">
+        <div class="card-header text-white bg-green">
+          Total Educational Payment
+        </div>
+        <div class="card-body">
+          <blockquote class="blockquote mb-0">
+            <p id="totalPayments">Loading...</p>
+          </blockquote>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+      <div class="card">
+        <div class="card-header text-white bg-purple" >
+          Total Medical Beneficiaries
+        </div>
+        <div class="card-body">
+          <blockquote class="blockquote mb-0">
+            <p id="totalMedicals">Loading...</p>
+          </blockquote>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+      <div class="card">
+        <div class="card-header text-white bg-orange">
+          Total Cash Donations
+        </div>
+        <div class="card-body">
+          <blockquote class="blockquote mb-0">
+            <p id="totalDonations">Loading...</p>
+          </blockquote>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
         <div class="charts">
             <canvas id="paymentsChart"></canvas>
         </div>
@@ -41,9 +92,8 @@
                     return null;
                 }
             }
-
-            // Fetch and display the total counts
-            function displayTotalCounts() {
+ // Fetch and display the total Amounts
+            function displayTotalAmounts() {
                 fetchData("/beneficiaries").then(data => {
                     if (Array.isArray(data)) {
                         document.getElementById("totalBeneficiaries").textContent = `Total Beneficiaries: ${data.length}`;
@@ -66,6 +116,49 @@
                     if (Array.isArray(data)) {
                         document.getElementById("totalDonations").textContent = `Total Cash Donations: ${data.length}`;
                     }
+                });
+            }
+
+            // Fetch and display the total counts
+            function displayTotalCounts() {
+                fetchData("/beneficiaries").then(data => {
+                    if (Array.isArray(data)) {
+                        document.getElementById("totalBeneficiaries").textContent = `Total Beneficiaries: ${data.length}`;
+            
+                    }
+                });
+
+                fetchData("/payments").then(data => {
+        if (Array.isArray(data)) {
+            // Calculate the total sum of total_amount
+            const totalAmount = data.reduce((sum, payment) => {
+                return sum + parseFloat(payment.total_amount.$numberDecimal);
+            }, 0);
+
+            document.getElementById("totalPayments").textContent = `Total Student Funding: ${totalAmount.toLocaleString()} Naira`;
+        }
+    });
+
+                fetchData("/medical-records").then(data => {
+        if (Array.isArray(data)) {
+            // Calculate the total sum of line_total
+            const totalMedicals = data.reduce((sum, medical) => {
+                return sum + parseFloat(medical.line_total.$numberDecimal);
+            }, 0);
+
+            document.getElementById("totalMedicals").textContent = `Total Medical Costs: ${totalMedicals.toLocaleString()} Naira`;
+        }
+    });
+
+                fetchData("/donations").then(data => {
+                    if (Array.isArray(data))  {
+            // Calculate the total sum of amounts
+            const totalAmount = data.reduce((sum, donation) => {
+                return sum + parseFloat(donation.amount.$numberDecimal);
+            }, 0);
+
+            document.getElementById("totalDonations").textContent = `Total Cash Donations: ${totalAmount.toLocaleString()} Naira`;
+        }
                 });
             }
 
