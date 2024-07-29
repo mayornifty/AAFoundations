@@ -16,9 +16,15 @@
   <div class="row">
     <div class="col-md-6 mb-4">
       <div class="card">
-        <div class="card-header text-white bg-blue" id="TotalBen">
-          Total Beneficiaries
-        </div>
+         <div class="card-header text-white bg-blue d-flex justify-content-between" >
+          <div>
+            Beneficiaries
+          </div>
+          <div>
+            Total Amount Spent: $100
+          </div>
+          </div>
+          
         <div class="card-body">
           <blockquote class="blockquote mb-0">
             <p id="totalBeneficiaries">Loading...</p>
@@ -29,8 +35,11 @@
 
     <div class="col-md-6 mb-4">
       <div class="card">
-        <div class="card-header text-white bg-green">
-          Total Educational Payment
+         <div class="card-header text-white bg-green d-flex justify-content-between" >
+          <div>
+            Education
+          </div><div  id="EduAMT">Amount Spent: $100</div>
+          
         </div>
         <div class="card-body">
           <blockquote class="blockquote mb-0">
@@ -42,8 +51,10 @@
 
     <div class="col-md-6 mb-4">
       <div class="card">
-        <div class="card-header text-white bg-purple" >
-          Total Medical Beneficiaries
+        <div class="card-header text-white bg-purple d-flex justify-content-between" >
+          <div> Health Care</div>
+          <div id="HealthAMT">Amount Spent: $0.00</div>
+         
         </div>
         <div class="card-body">
           <blockquote class="blockquote mb-0">
@@ -55,8 +66,9 @@
 
     <div class="col-md-6 mb-4">
       <div class="card">
-        <div class="card-header text-white bg-orange">
-          Total Cash Donations
+        <div class="card-header text-white bg-orange d-flex justify-content-between" >
+         <div> Donations</div>
+          <div id="DonAMT">Amount Spent: $0.00</div>
         </div>
         <div class="card-body">
           <blockquote class="blockquote mb-0">
@@ -66,6 +78,47 @@
       </div>
     </div>
   </div>
+
+
+
+
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+      <div class="card">
+        <div class="card-header text-white bg-green d-flex justify-content-between">
+            <div>Entrepreneurial Support</div>
+            <div>Amount Spent: $100</div>
+        </div>
+        <div class="card-body">
+          <blockquote class="blockquote mb-0">
+            <p id="totalProject">Loading...</p>
+          </blockquote>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+      <div class="card">
+          <div class="card-header text-white bg-blue d-flex justify-content-between">
+            <div>Projects</div>
+            <div>Amount Spent: $100</div>
+        </div>
+        <div class="card-body">
+          <blockquote class="blockquote mb-0">
+            <p id="totalProject">
+              
+        Jesuit College  |  Drainages  |  Boreholes
+            </p>
+          </blockquote>
+        </div>
+      </div>
+    </div>   
+  </div>
+
+
+
+
 </div>
 
         <div class="charts">
@@ -135,7 +188,8 @@
                 return sum + parseFloat(payment.total_amount.$numberDecimal);
             }, 0);
 
-            document.getElementById("totalPayments").textContent = `Total Student Funding: ${totalAmount.toLocaleString()} Naira`;
+            document.getElementById("totalPayments").textContent = `Total Funding: ${totalAmount.toLocaleString()} Naira`;
+        document.getElementById("EduAMT").textContent = `Total Funding: ${totalAmount.toLocaleString()} Naira`;
         }
     });
 
@@ -147,6 +201,8 @@
             }, 0);
 
             document.getElementById("totalMedicals").textContent = `Total Medical Costs: ${totalMedicals.toLocaleString()} Naira`;
+        
+            document.getElementById("HealthAMT").textContent = `Amount Spent: ${totalMedicals.toLocaleString()} Naira`;
         }
     });
 
@@ -158,6 +214,7 @@
             }, 0);
 
             document.getElementById("totalDonations").textContent = `Total Cash Donations: ${totalAmount.toLocaleString()} Naira`;
+        document.getElementById("DonAMT").textContent = `Total Cash Donations: ${totalAmount.toLocaleString()} Naira`;
         }
                 });
             }
